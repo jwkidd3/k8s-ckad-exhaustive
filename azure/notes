@@ -1,0 +1,9 @@
+
+az aks get-credentials --resource-group jkiaks --name jkaks
+az aks update -n jkaks  -g jkiaks  --enable-disk-driver --enable-file-driver --enable-blob-driver --enable-snapshot-controller
+
+
+
+https://learn.microsoft.com/en-us/azure/aks/azure-csi-blob-storage-provision?tabs=mount-nfs%2Csecret
+
+
