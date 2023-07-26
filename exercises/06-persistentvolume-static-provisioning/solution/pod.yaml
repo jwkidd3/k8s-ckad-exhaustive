@@ -12,5 +12,6 @@ spec:
   volumes:
   - name: configpvc
     persistentVolumeClaim:
+      readOnly: true
       claimName: pvc
   restartPolicy: Never

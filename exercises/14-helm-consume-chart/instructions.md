@@ -23,3 +23,7 @@ In this exercise, you use Helm to install Kubernetes objects needed for the open
 7. Use the kubectl `port-forward` command to forward the local port 8080 to the port 9090 of the Service.
 8. Open a browser and bring up the Prometheus dashboard.
 9. Stop port forwarding and uninstall the Helm chart.
+10. 
+
+
+kubectl port-forward service/prometheus-operated 8080:9090
