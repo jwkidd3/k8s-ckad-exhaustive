@@ -10,7 +10,7 @@ spec:
     name: hello
     ports:
     - name: nodejs-port
-      containerPort: 3000
+      containerPort: 3001
     readinessProbe:
       httpGet:
         path: /

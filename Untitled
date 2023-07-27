@@ -1,18 +1,4 @@
 kubectl run nginx --image=nginx --dry-run=client -o yaml > nginx-pod.yaml
 
-
-kubectl run hazelcast↵ --image=hazelcast/hazelcast↵ --restart=Never↵ --ns test
---port=5701↵ --env="DNS_DOMAIN=cluster"↵ --labels="app=hazelcast,env=prod" 
-
-
-apiVersion: batch/v1 kind: Job
-metadata:
-name: counter spec:
-  template:
-    spec:
-restartPolicy: OnFailure containers:
-- args:
-- /bin/sh
-- -c
-- ...
-image: nginx:1.24.0 name: counter
+sudo service apache2 stop
+sudo update-rc.d apache2 disable

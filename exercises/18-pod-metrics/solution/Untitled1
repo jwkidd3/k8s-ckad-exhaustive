@@ -1,0 +1,1 @@
+kubectl run api-call --image=alpine:3.16.2 -it --rm ↵ --restart=Never -- https://kubernetes.default.svc.cluster.local/↵ api/v1/namespaces/k97/pods
