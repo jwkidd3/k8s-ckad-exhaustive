@@ -1,4 +1,0 @@
-kubectl run nginx --image=nginx --dry-run=client -o yaml > nginx-pod.yaml
-
-sudo service apache2 stop
-sudo update-rc.d apache2 disable
