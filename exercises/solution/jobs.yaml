@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: order-simulator
+  namespace: rvstore
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 45
+      backoffLimit: 2
+      ttlSecondsAfterFinished: 120
+      template:
+        metadata:
+          annotations:
+            linkerd.io/inject: disabled # Turn off Linkerd proxy injection (ignore this if you didn't learn about Linkerd)
+        spec:
+          containers:
+          - name: rvstore-order-simulator
+            image: public.ecr.aws/vergeops/rvstore-order-simulator
+            imagePullPolicy: IfNotPresent
+            envFrom:
+            - configMapRef:
+                name: workload-config
+            env:
+            - name: JOB
+              value: "true"
+          restartPolicy: Never
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: product-sync
+  namespace: rvstore
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 45
+      backoffLimit: 2
+      ttlSecondsAfterFinished: 120
+      template:
+        metadata:
+          annotations:
+            linkerd.io/inject: disabled # Turn off Linkerd proxy injection (ignore this if you didn't learn about Linkerd)
+        spec:
+          containers:
+          - name: rvstore-product-sync
+            image: public.ecr.aws/vergeops/rvstore-product-sync
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: JOB
+              value: "true"
+          restartPolicy: Never

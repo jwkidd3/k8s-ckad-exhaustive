@@ -1,0 +1,215 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui-deployment
+  namespace: rvstore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ui
+  template:
+    metadata:
+      labels:
+        app: ui
+    spec:
+      containers:
+      - name: ui
+        image: public.ecr.aws/vergeops/rvstore-ui
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: ui-port
+          containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: ui-port
+        readinessProbe:
+          httpGet:
+            path: /
+            port: ui-port
+          periodSeconds: 10
+          successThreshold: 2
+          failureThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /
+            port: ui-port
+          periodSeconds: 10
+          failureThreshold: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-api-deployment
+  namespace: rvstore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-api
+  template:
+    metadata:
+      labels:
+        app: product-api
+    spec:
+      volumes:
+      - name: products-volume
+        configMap:
+          name: products-config   
+      containers:
+      - name: rvstore-product-api
+        image: public.ecr.aws/vergeops/rvstore-product-api
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: product-port
+          containerPort: 9001
+        volumeMounts:
+        - name: products-volume
+          mountPath: /data/products
+        env:
+        - name: PRODUCT_FILE_LOCATION
+          value: /data/products
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: product-port
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: product-port
+          periodSeconds: 10
+          successThreshold: 2
+          failureThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /health
+            port: product-port
+          periodSeconds: 10
+          failureThreshold: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-api-deployment
+  namespace: rvstore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-api
+  template:
+    metadata:
+      labels:
+        app: auth-api
+    spec:
+      containers:
+      - name: rvstore-auth-api
+        image: public.ecr.aws/vergeops/rvstore-auth-api
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: auth-port
+          containerPort: 9003
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: auth-port
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: auth-port
+          periodSeconds: 10
+          successThreshold: 2
+          failureThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /health
+            port: auth-port
+          periodSeconds: 10
+          failureThreshold: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-api-deployment
+  namespace: rvstore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-api
+  template:
+    metadata:
+      labels:
+        app: order-api
+    spec:
+      containers:
+      - name: rvstore-order-api
+        image: public.ecr.aws/vergeops/rvstore-order-api
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: workload-config
+        ports:
+        - name: order-port
+          containerPort: 9002
+        livenessProbe:
+          httpGet:
+            path: /orders
+            port: order-port
+        readinessProbe:
+          httpGet:
+            path: /orders
+            port: order-port
+          periodSeconds: 10
+          successThreshold: 2
+          failureThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /orders
+            port: order-port
+          periodSeconds: 10
+          failureThreshold: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-deployment
+  namespace: rvstore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+      - name: rvstore-api-gateway
+        image: public.ecr.aws/vergeops/rvstore-gateway-service
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: gw-port
+          containerPort: 9000
+        envFrom:
+        - configMapRef:
+            name: workload-config
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: gw-port
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: gw-port
+          periodSeconds: 10
+          successThreshold: 2
+          failureThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /health
+            port: gw-port
+          periodSeconds: 10
+          failureThreshold: 5
