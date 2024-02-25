@@ -1,0 +1,26 @@
+server:
+  port: 9000
+ribbon:
+  eureka:
+    enabled: false
+zuul:
+  debug:
+    request: true
+    include-debug-header: true
+  routes:
+    search:
+      path: /products/_search
+      sensitiveHeaders: Cookie,Set-Cookie
+      url: http://localhost:9200
+    products:
+      path: /products/**
+      sensitiveHeaders: Cookie,Set-Cookie
+      url: http://localhost:9001/products
+    orders:
+      path: /orders/**
+      sensitiveHeaders: Cookie,Set-Cookie
+      url: http://localhost:9002/orders
+    auth:
+      path: /auth/**
+      sensitiveHeaders: Cookie,Set-Cookie
+      url: http://localhost:9003/auth
