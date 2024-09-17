@@ -1,6 +1,0 @@
-k apply -f blob-nfs-pvc.yaml
-k apply -f blob-nfs-pv.1.yaml 
-k apply -f blob-nfs-pv.2.yaml
-k get pod,pv,pvc
-kubectl exec mypod1 -- touch /mnt/blob/test1.txt 
-kubectl exec mypod2 -- ls /mnt/blob
