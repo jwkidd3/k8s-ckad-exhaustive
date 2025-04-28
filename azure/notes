@@ -1,8 +1,0 @@
-
-az aks get-credentials --resource-group jkiaks --name jkaks
-az aks update -n AKSDelta  -g AKSDeltaRG  --enable-disk-driver --enable-file-driver --enable-blob-driver --enable-snapshot-controller
-
-
-
-
-
