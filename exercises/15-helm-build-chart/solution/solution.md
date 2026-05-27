@@ -9,7 +9,7 @@ $ vim Chart.yaml
 Add the following content to the file:
 
 ```yaml
-apiVersion: 1.0.0
+apiVersion: v2
 name: web-app
 version: 2.5.4
 ```

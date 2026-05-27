@@ -23,4 +23,4 @@ spec:
             - ssd
   containers:
   - name: nginx-with-node-affinity
-    image: nginx:latest
+    image: nginx:1.23.4

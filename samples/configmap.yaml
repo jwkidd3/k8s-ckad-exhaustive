@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: mongodb
-        image: mongo
+        image: mongo:7.0
         envFrom:
         - configMapRef:
             name: mongodb-config

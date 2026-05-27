@@ -17,7 +17,7 @@ spec:
         image: vergeops/versioned-nginx:liveness
       initContainers:
       - name: random-wait
-        image: busybox:1.28
+        image: busybox:1.36
         command: ['sh', '-c', 'echo Sleeping...; sleep $((RANDOM % 30)); echo Done;']
 ---
 kind: Service

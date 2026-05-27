@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: nginx
 spec:
+  type: ClusterIP
   selector:
     version: blue
   ports:
     - protocol: TCP
       port: 80
-      nodePort: 30080
-  type: NodePort
+      targetPort: 80

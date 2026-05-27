@@ -1,16 +1,16 @@
 # Solution
 
-Start by creating a basic definition of a Pod. The following YAML manifest defines the Pod named `hello` with a single container running the image `bmuschko/nodejs-hello-world:1.0.0`.
+Start by creating a basic definition of a Pod. The following YAML manifest defines the Pod named `hello-world` with a single container running the image `bmuschko/nodejs-hello-world:1.0.0`.
 
 ```yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  name: hello
+  name: hello-world
 spec:
   containers:
   - image: bmuschko/nodejs-hello-world:1.0.0
-    name: hello
+    name: hello-world
     ports:
     - name: nodejs-port
       containerPort: 3000
@@ -22,11 +22,11 @@ Add a Volume to the Pod and mount it in the container.
 apiVersion: v1
 kind: Pod
 metadata:
-  name: hello
+  name: hello-world
 spec:
   containers:
   - image: bmuschko/nodejs-hello-world:1.0.0
-    name: hello
+    name: hello-world
     ports:
     - name: nodejs-port
       containerPort: 3000
@@ -44,11 +44,11 @@ Lastly, define the resource requirements for the container.
 apiVersion: v1
 kind: Pod
 metadata:
-  name: hello
+  name: hello-world
 spec:
   containers:
   - image: bmuschko/nodejs-hello-world:1.0.0
-    name: hello
+    name: hello-world
     ports:
     - name: nodejs-port
       containerPort: 3000
@@ -72,7 +72,7 @@ Create the Pod object with the following command:
 
 ```
 $ kubectl apply -f pod.yaml
-pod/hello created
+pod/hello-world created
 ```
 
 The cluster in this scenario consists of three nodes, one control-plane node and two worker nodes. Be aware that your setup will likely look different.
@@ -88,18 +88,18 @@ minikube-m03   Ready    <none>          26s   v1.26.3
 The `-o wide` flag renders the node the Pod is running on, in this case the node named `minikube-m03`.
 
 ```
-$ kubectl get pod hello -o wide
-NAME    READY   STATUS    RESTARTS   AGE   IP           NODE           NOMINATED NODE   READINESS GATES
-hello   1/1     Running   0          25s   10.244.2.2   minikube-m03   <none>           <none>
+$ kubectl get pod hello-world -o wide
+NAME          READY   STATUS    RESTARTS   AGE   IP           NODE           NOMINATED NODE   READINESS GATES
+hello-world   1/1     Running   0          25s   10.244.2.2   minikube-m03   <none>           <none>
 ```
 
 The details of the Pod provide information about the container's resource requirements.
 
 ```
-$ kubectl describe pod hello
+$ kubectl describe pod hello-world
 ...
 Containers:
-  hello:
+  hello-world:
     ...
     Limits:
       ephemeral-storage:  2Gi
@@ -107,6 +107,6 @@ Containers:
     Requests:
       cpu:                100m
       ephemeral-storage:  1Gi
-      memory:             500M
+      memory:             500Mi
 ...
 ```

@@ -64,7 +64,7 @@ spec:
   - image: nginx:1.21.6
     name: app
     volumeMounts:
-    - mountPath: "/data/app/config"
+    - mountPath: "/var/app/config"
       name: configpvc
   volumes:
   - name: configpvc
@@ -84,7 +84,7 @@ Shell into the Pod and create a file in the mounted directory.
 
 ```
 $ kubectl exec app -it -- /bin/sh
-# cd /data/app/config
+# cd /var/app/config
 # ls -l
 total 0
 # touch test.txt
