@@ -10,7 +10,7 @@ metadata:
 spec:
   containers:
   - name: busybox
-    image: busybox:1.28
+    image: busybox:1.36
     command: ["sh", "-c", "sleep 1h"]
 ```
 
@@ -24,7 +24,7 @@ metadata:
 spec:
   containers:
   - name: busybox
-    image: busybox:1.28
+    image: busybox:1.36
     command: ["sh", "-c", "sleep 1h"]
     volumeMounts:
     - name: vol
@@ -48,7 +48,7 @@ spec:
     fsGroup: 2000
   containers:
   - name: busybox
-    image: busybox:1.28
+    image: busybox:1.36
     command: ["sh", "-c", "sleep 1h"]
     volumeMounts:
     - name: vol

@@ -58,7 +58,7 @@ Create the file `web-app-service-template.yaml` in the directory `templates`. Ad
 apiVersion: v1
 kind: Service
 metadata:
-  name: hello-world-service
+  name: web-app-service
   namespace: {{ .Release.Namespace }}
 spec:
   type: ClusterIP
@@ -108,7 +108,7 @@ The objects from the chart now exist in the `web-app` namespace.
 ```
 $ kubectl get services,pods -n web-app
 NAME                          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
-service/hello-world-service   ClusterIP   10.110.146.91   <none>        9090/TCP   70s
+service/web-app-service   ClusterIP   10.110.146.91   <none>        9090/TCP   70s
 
 NAME              READY   STATUS    RESTARTS   AGE
 pod/hello-world   1/1     Running   0          70s

@@ -74,6 +74,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: serviceaccount-service-rolebinding
+  namespace: t23
 subjects:
 - kind: ServiceAccount
   name: api-call
