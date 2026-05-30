@@ -1,4 +1,4 @@
-# three node (two workers) cluster config
+# four node cluster: one control-plane, three workers
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 name: cluster

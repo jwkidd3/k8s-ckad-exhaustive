@@ -29,8 +29,8 @@ metadata:
   namespace: d92
 spec:
   containers:
-  - image: nginx:1.23.4-alpine
-    name: nginx
+  - image: bmuschko/nodejs-hello-world:1.0.0
+    name: hello-world
 ```
 
 Create the Pod object using the `apply` command.
@@ -46,7 +46,7 @@ A Pod without specifying resource requirements will use the default request and 
 $ kubectl describe pod pod-without-resource-requirements -n d92
 ...
 Containers:
-  nginx:
+  hello-world:
     Limits:
       cpu:  500m
     Requests:
@@ -63,8 +63,8 @@ metadata:
   namespace: d92
 spec:
   containers:
-  - image: nginx:1.23.4-alpine
-    name: nginx
+  - image: bmuschko/nodejs-hello-world:1.0.0
+    name: hello-world
     resources:
       requests:
         cpu: 400m
@@ -89,8 +89,8 @@ metadata:
   namespace: d92
 spec:
   containers:
-  - image: nginx:1.23.4-alpine
-    name: nginx
+  - image: bmuschko/nodejs-hello-world:1.0.0
+    name: hello-world
     resources:
       requests:
         cpu: 350m
@@ -111,7 +111,7 @@ The Pod uses the provided CPU resource request and limit.
 $ kubectl describe pod pod-with-less-cpu-resource-requirements -n d92
 ...
 Containers:
-  nginx:
+  hello-world:
     Limits:
       cpu:  400m
     Requests:

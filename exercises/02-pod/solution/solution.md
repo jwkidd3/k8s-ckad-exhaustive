@@ -38,6 +38,12 @@ Events:
   Warning  Failed                 69s (x6 over 3m)    kubelet, docker-for-desktop  Error: ImagePullBackOff
 ```
 
+The root cause is that the image tag `nginx:2.3.5` does not exist on Docker Hub, so the kubelet cannot pull it. Record this in a file named `pod-error.txt` in your working directory:
+
+```
+$ echo "Image nginx:2.3.5 does not exist on Docker Hub (ImagePullBackOff)." > pod-error.txt
+```
+
 Go ahead and edit the existing Pod. Alternatively, you could also just use the `kubectl set image pod mypod mypod=nginx --namespace=ckad-prep` command.
 
 ```

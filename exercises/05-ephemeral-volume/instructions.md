@@ -10,7 +10,7 @@
 </p>
 </details>
 
-In this exercise, you will create a Pod that runs the web server [nginx](https://docs.nginx.com/nginx/admin-guide/web-server/). Nginx requires certains directory paths to be writable. We'll mount ephemeral Volumes to make those paths available to container.
+In this exercise, you will create a Pod that runs the web server [nginx](https://docs.nginx.com/nginx/admin-guide/web-server/). Nginx requires certain directory paths to be writable. We'll mount ephemeral Volumes to make those paths available to the container.
 
 1. Create a Pod named `nginx` in the namespace `h92`. Its container should run the container image `nginx:1.21.6`.
 2. Define a Volume of type `emptyDir` named `nginx-run` which mounts the path `/var/run` to the container.

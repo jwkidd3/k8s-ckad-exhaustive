@@ -91,22 +91,22 @@ $ ls web-app-2.5.4.tgz
 web-app-2.5.4.tgz
 ```
 
-Install the chart with the custom namespace `web-app`.
+Install the chart to the namespace `app-stack`.
 
 ```
-$ helm install --namespace web-app --create-namespace --set service_port=9090 hello-world .
+$ helm install --namespace app-stack --create-namespace --set service_port=9090 hello-world .
 NAME: hello-world
 LAST DEPLOYED: Thu May 18 16:55:31 2023
-NAMESPACE: web-app
+NAMESPACE: app-stack
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
 ```
 
-The objects from the chart now exist in the `web-app` namespace.
+The objects from the chart now exist in the `app-stack` namespace.
 
 ```
-$ kubectl get services,pods -n web-app
+$ kubectl get services,pods -n app-stack
 NAME                          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
 service/web-app-service   ClusterIP   10.110.146.91   <none>        9090/TCP   70s
 
@@ -117,6 +117,6 @@ pod/hello-world   1/1     Running   0          70s
 Uninstall the chart with the following command. Make sure to provide the namespace.
 
 ```
-$ helm uninstall hello-world -n web-app
+$ helm uninstall hello-world -n app-stack
 release "hello-world" uninstalled
 ```
