@@ -17,4 +17,4 @@ In this exercise, you will create a PersistentVolume, connect it to a Persistent
 1. Create a PersistentVolume named `pv`, access mode `ReadWriteMany`, 512Mi of storage capacity and the host path `/data/config`.
 2. Create a PersistentVolumeClaim named `pvc`. The claim should request 256Mi and use an empty string value for the storage class. Ensure that the PersistentVolumeClaim is properly bound after its creation.
 3. Mount the PersistentVolumeClaim from a new Pod named `app` with the path `/var/app/config`. The Pod uses the image `nginx:1.21.6`.
-4. Open an interactive shell to the Pod and create a file in the directory `/var/app/config`.
+4. Open an interactive shell to the Pod and create an empty file named `test.txt` in the directory `/var/app/config`. Confirm with `ls -l` that the file exists.
