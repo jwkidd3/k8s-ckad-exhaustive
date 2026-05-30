@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 0: Course Intro &amp; Cluster Setup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/white.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/monokai.min.css">
+    <style>
+        :root {
+            --k8s-blue: #326ce5;
+            --k8s-light: #4285f4;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        .reveal { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 30px; font-weight: 300; color: #2c3e50; overflow: hidden; }
+        .reveal h1, .reveal h2, .reveal h3 { color: var(--k8s-blue); margin-bottom: 0.5em; }
+        .reveal h1 { font-size: 1.7em; margin-bottom: 0.2em; }
+        .reveal h2 { font-size: 1.3em; margin-bottom: 0.2em; }
+        .reveal h3 { font-size: 1.0em; margin-bottom: 0.1em; }
+        .reveal .slides section { text-align: left; display: flex; flex-direction: column; justify-content: flex-start; padding: 10px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; max-height: 100vh; }
+        .reveal .slides { height: 100%; width: 100%; }
+        .reveal .title-slide { text-align: center; justify-content: center; }
+        .reveal code { background-color: #2d3748; color: #e2e8f0; border-radius: 4px; padding: 4px 8px; font-size: 0.85em; }
+        .reveal pre { box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; margin: 10px 0; width: 100%; background-color: #272822; padding: 0; overflow: visible; }
+        .reveal pre code { padding: 15px; font-size: 0.7em; line-height: 1.2; max-height: 400px; overflow-y: auto; overflow-x: auto; word-wrap: normal; white-space: pre; display: block; background-color: #272822 !important; border: none; color: #f8f8f2 !important; }
+        .reveal .two-column { display: flex; gap: 40px; height: calc(100% - 120px); }
+        .reveal .column { flex: 1; overflow-y: auto; }
+        .reveal .three-column { display: flex; gap: 20px; height: calc(100% - 120px); }
+        .reveal .three-column .column { flex: 1; }
+        .reveal .highlight { background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left: 4px solid var(--warning-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .danger { background: linear-gradient(135deg, #f8d7da 0%, #fab1a0 100%); border-left: 4px solid var(--danger-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .success { background: linear-gradient(135deg, #d4edda 0%, #a8e6cf 100%); border-left: 4px solid var(--success-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .k8s-logo { background: var(--k8s-blue); color: white; padding: 10px 20px; border-radius: 8px; display: inline-block; margin: 10px 0; }
+        .reveal ul, .reveal ol { font-size: 0.7em; line-height: 1.2; margin: 0.2em 0 0.2em 0.5em; }
+        .reveal li { margin-bottom: 2px; }
+        .reveal .subtitle { font-size: 1.2em; color: #666; margin-bottom: 40px; }
+        .reveal .emoji { font-size: 1.2em; }
+        .reveal .architecture-diagram { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0; font-family: monospace; font-size: 0.7em; white-space: pre; }
+        .reveal .progress-indicator { position: fixed; top: 20px; right: 20px; background: var(--k8s-blue); color: white; padding: 10px 15px; border-radius: 20px; font-size: 0.7em; z-index: 1000; }
+        .reveal .lab-callout { display: flex; align-items: center; justify-content: center; height: 100%; overflow: auto; padding: 10px; }
+        .reveal .lab-callout h1 { font-size: 1.3em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout h2 { font-size: 1.0em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout h3 { font-size: 0.9em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout ul { font-size: 0.7em; line-height: 1.2; margin: 0.2em 0; }
+        .reveal .lab-callout li { margin: 0.1em 0; }
+        .reveal .lab-callout > div { padding: 8px; max-width: 95%; }
+        .reveal .lab-callout p { margin: 0.2em 0; font-size: 0.9em; }
+        .reveal table { font-size: 0.65em; border-collapse: collapse; width: 100%; }
+        .reveal table th, .reveal table td { padding: 4px 6px; border: 1px solid #ddd; }
+        .reveal table th { background: var(--k8s-blue); color: white; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <section class="title-slide">
+                <h1><span class="emoji">☸️</span> Module 0: Course Intro &amp; Cluster Setup</h1>
+                <div class="k8s-logo">Certified Kubernetes Application Developer</div>
+                <p class="subtitle">Welcome &bull; Course Roadmap &bull; Cloud9 &amp; kind</p>
+                <div class="highlight">
+                    <p><strong>📚 In this module:</strong> What CKAD is, how this course is structured, and how to stand up the local kind cluster you'll use for every lab.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">📋</span> Module Agenda</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Course Orientation</h3>
+                        <ul>
+                            <li>What is Kubernetes (10,000-ft view)</li>
+                            <li>What CKAD certifies — exam blueprint</li>
+                            <li>Course structure: 32 hands-on exercises</li>
+                            <li>How theory and labs interleave</li>
+                        </ul>
+                        <h3>Delivery Environment</h3>
+                        <ul>
+                            <li>AWS Cloud9 as our IDE</li>
+                            <li>kind for local single-host clusters</li>
+                            <li>4-node cluster from <code>kind-config.yaml</code></li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Setup Steps</h3>
+                        <ul>
+                            <li>Install <code>kubectl</code></li>
+                            <li>Install <code>kind</code> v0.27.0</li>
+                            <li>Create the cluster</li>
+                            <li>Install metrics-server</li>
+                            <li>Verify with <code>kubectl get nodes</code></li>
+                        </ul>
+                        <div class="success" style="margin-top: 15px;">
+                            <p><strong>🎯 Outcome:</strong> A 4-node kind cluster ready for every lab in the course.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">☸️</span> What is Kubernetes?</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>An Orchestrator for Containers</h3>
+                        <ul>
+                            <li><strong>Schedules</strong> containers onto worker nodes</li>
+                            <li><strong>Heals</strong> failed workloads automatically</li>
+                            <li><strong>Scales</strong> applications horizontally</li>
+                            <li><strong>Exposes</strong> them through stable network endpoints</li>
+                            <li><strong>Configures</strong> them through ConfigMaps and Secrets</li>
+                        </ul>
+                        <h3>Declarative Model</h3>
+                        <div class="highlight">
+                            <p>You describe the <em>desired state</em> in YAML. The control plane works continuously to make reality match that state.</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <h3>Cluster Anatomy</h3>
+                        <div class="architecture-diagram">┌─────────────────────────────┐
+│      Control Plane          │
+│  api-server  scheduler      │
+│  controller-mgr  etcd       │
+└──────────────┬──────────────┘
+               │
+   ┌───────────┼───────────┐
+   ▼           ▼           ▼
+ worker1    worker2     worker3
+ (kubelet + container runtime)</div>
+                        <p style="font-size: 0.7em;">Your kind cluster runs this whole topology inside Docker containers on a single Cloud9 host.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🎓</span> CKAD: What You're Being Certified On</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Exam Format</h3>
+                        <ul>
+                            <li>2 hours, performance-based — you run real <code>kubectl</code> commands against real clusters</li>
+                            <li>15–20 task-based questions</li>
+                            <li>Passing score: 66%</li>
+                            <li>Open documentation: kubernetes.io/docs</li>
+                        </ul>
+                        <div class="highlight">
+                            <p><strong>Mental model:</strong> CKAD measures speed and accuracy on <em>application developer</em> tasks — not cluster admin tasks.</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <h3>Curriculum Domains</h3>
+                        <table>
+                            <thead>
+                                <tr><th>Domain</th><th>Weight</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Application Design &amp; Build</td><td>20%</td></tr>
+                                <tr><td>Application Deployment</td><td>20%</td></tr>
+                                <tr><td>Observability &amp; Maintenance</td><td>15%</td></tr>
+                                <tr><td>Environment, Config &amp; Security</td><td>25%</td></tr>
+                                <tr><td>Services &amp; Networking</td><td>20%</td></tr>
+                            </tbody>
+                        </table>
+                        <p style="font-size: 0.7em;">The five modules in this course mirror these five domains.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🗺️</span> Course Structure: 6 Modules, 32 Labs</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <ul>
+                            <li><strong>Module 0</strong> — Intro &amp; Setup &nbsp;<em>(this module)</em></li>
+                            <li><strong>Module 1</strong> — Application Design &amp; Build &nbsp;<em>(labs 01–09, 14)</em></li>
+                            <li><strong>Module 2</strong> — Application Deployment &nbsp;<em>(labs 11–13, 15)</em></li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <ul>
+                            <li><strong>Module 3</strong> — Observability &amp; Maintenance &nbsp;<em>(labs 10, 16–19)</em></li>
+                            <li><strong>Module 4</strong> — Environment, Config &amp; Security &nbsp;<em>(labs 20–27)</em></li>
+                            <li><strong>Module 5</strong> — Services &amp; Networking &nbsp;<em>(labs 28–31)</em></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight" style="margin-top: 20px;">
+                    <p><strong>Rhythm:</strong> Short teaching segment → lab callout → hands-on exercise → walkthrough. Every concept is exercised before we move on.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🛠️</span> Delivery Environment: Cloud9 + kind</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>AWS Cloud9</h3>
+                        <ul>
+                            <li>Browser-based IDE running on Amazon Linux</li>
+                            <li>Docker is pre-installed</li>
+                            <li>One Cloud9 instance per student</li>
+                            <li>x86_64 Linux — all install commands target this arch</li>
+                        </ul>
+                        <h3>kind — Kubernetes IN Docker</h3>
+                        <ul>
+                            <li>Each Kubernetes node is a Docker container</li>
+                            <li>Whole cluster lives on one host — perfect for labs</li>
+                            <li>Fast to create, fast to throw away</li>
+                            <li>We use a 4-node config: 1 control-plane + 3 workers</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Why kind for CKAD prep?</h3>
+                        <div class="success">
+                            <p>The CKAD exam itself runs against multi-node clusters. kind reproduces that topology locally so scheduling, NodePort behavior, and taints all behave realistically.</p>
+                        </div>
+                        <h3>Repo Layout</h3>
+                        <pre><code class="language-text">k8s-ckad-exhaustive/
+├── kind-config.yaml      ← cluster definition
+├── components.yaml       ← metrics-server
+├── exercises/
+│   ├── 00-setup/         ← this module's lab
+│   ├── 01-container/
+│   └── ... (31 more)
+└── presentations/        ← these slides</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">⌨️</span> Install kubectl + kind</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>1. Confirm Docker</h3>
+                        <pre><code class="language-bash">$ docker info | head -5</code></pre>
+                        <p style="font-size: 0.75em;">If Docker isn't running: <code>sudo service docker start</code></p>
+                        <h3>2. Install kubectl</h3>
+                        <pre><code class="language-bash">curl -LO "https://dl.k8s.io/release/$(curl -L -s \
+  https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 \
+  kubectl /usr/local/bin/kubectl
+kubectl version --client</code></pre>
+                    </div>
+                    <div class="column">
+                        <h3>3. Install kind v0.27.0</h3>
+                        <pre><code class="language-bash">curl -Lo ./kind \
+  https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+kind version</code></pre>
+                        <div class="highlight">
+                            <p><strong>Version note:</strong> kind v0.27 ships kindest/node v1.32, which is current for CKAD as of 2026.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🚀</span> Create &amp; Verify the Cluster</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Create from kind-config.yaml</h3>
+                        <pre><code class="language-bash">$ cd ~/environment/k8s-ckad-exhaustive
+$ kind create cluster --config kind-config.yaml
+Creating cluster "cluster" ...
+ ✓ Ensuring node image (kindest/node:v1.32.0)
+ ✓ Preparing nodes 📦 📦 📦 📦
+ ✓ Writing configuration 📜
+ ✓ Starting control-plane 🕹️
+ ✓ Installing CNI 🔌
+ ✓ Joining worker nodes 🚜</code></pre>
+                    </div>
+                    <div class="column">
+                        <h3>Verify Nodes</h3>
+                        <pre><code class="language-bash">$ kubectl get nodes
+NAME                    STATUS   ROLES
+cluster-control-plane   Ready    control-plane
+cluster-worker          Ready    &lt;none&gt;
+cluster-worker2         Ready    &lt;none&gt;
+cluster-worker3         Ready    &lt;none&gt;</code></pre>
+                        <h3>Install metrics-server</h3>
+                        <pre><code class="language-bash">$ kubectl apply -f components.yaml
+$ kubectl -n kube-system rollout status \
+    deployment/metrics-server</code></pre>
+                        <p style="font-size: 0.7em;">The <code>--kubelet-insecure-tls</code> flag is already baked into <code>components.yaml</code> so it works on kind out of the box.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Time for Hands-On Practice!</h1>
+                    <h2><span class="emoji">☸️</span> Lab 0: Stand Up Your kind Cluster</h2>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <h3>🎯 What You'll Build:</h3>
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Install kubectl and kind on Cloud9</li>
+                            <li>✅ Create a 4-node kind cluster from <code>kind-config.yaml</code></li>
+                            <li>✅ Install metrics-server</li>
+                            <li>✅ Verify <code>kubectl top nodes</code> returns data</li>
+                        </ul>
+                    </div>
+                    <div style="background: rgba(255,193,7,0.2); padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #ffc107;">
+                        <p style="font-size: 1.1em; margin: 10px 0 0 0;">Follow <code>exercises/00-setup/instructions.md</code></p>
+                    </div>
+                    <h2 style="margin-top: 30px; font-size: 2em;">🚀 Let's Get Your Cluster Online!</h2>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🧹</span> Tearing Down + Re-creating</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Delete a Cluster</h3>
+                        <pre><code class="language-bash">$ kind delete cluster --name cluster
+Deleting cluster "cluster" ...</code></pre>
+                        <div class="highlight">
+                            <p>Some labs benefit from a clean slate — feel free to delete and recreate. It takes about 60 seconds.</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <h3>Recover a Broken Cluster</h3>
+                        <ul>
+                            <li>If a node is stuck <code>NotReady</code> for &gt;5 min, delete and recreate.</li>
+                            <li>If <code>kubectl</code> hangs, check Docker: <code>docker ps</code></li>
+                            <li>If a Pod ends up Pending after a fresh start, check that metrics-server is running before re-running the lab.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="title-slide">
+                <h1><span class="emoji">✅</span> Setup Complete</h1>
+                <p class="subtitle">You have a working kind cluster. Next up: Module 1 — Application Design &amp; Build.</p>
+                <div class="success" style="font-size: 1.1em;">
+                    <p>If <code>kubectl get nodes</code> shows four <code>Ready</code> nodes, you're set for every remaining lab.</p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/notes/notes.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: false,
+            keyboard: true,
+            overview: true,
+            transition: 'slide',
+            transitionSpeed: 'default',
+            backgroundTransition: 'fade',
+            embedded: false,
+            autoSlide: 0,
+            loop: false,
+            shuffle: false,
+            fragments: true,
+            plugins: [ RevealHighlight, RevealNotes ],
+            highlight: { highlightOnLoad: true, theme: 'monokai' }
+        });
+        const progressIndicator = document.createElement('div');
+        progressIndicator.className = 'progress-indicator';
+        progressIndicator.textContent = 'Module 0 / 5';
+        document.body.appendChild(progressIndicator);
+    </script>
+</body>
+</html>

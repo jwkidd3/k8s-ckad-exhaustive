@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 2: Application Deployment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/white.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/monokai.min.css">
+    <style>
+        :root { --k8s-blue: #326ce5; --k8s-light: #4285f4; --success-color: #28a745; --warning-color: #ffc107; --danger-color: #dc3545; }
+        .reveal { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 30px; font-weight: 300; color: #2c3e50; overflow: hidden; }
+        .reveal h1, .reveal h2, .reveal h3 { color: var(--k8s-blue); margin-bottom: 0.5em; }
+        .reveal h1 { font-size: 1.7em; margin-bottom: 0.2em; }
+        .reveal h2 { font-size: 1.3em; margin-bottom: 0.2em; }
+        .reveal h3 { font-size: 1.0em; margin-bottom: 0.1em; }
+        .reveal .slides section { text-align: left; display: flex; flex-direction: column; justify-content: flex-start; padding: 10px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; max-height: 100vh; }
+        .reveal .slides { height: 100%; width: 100%; }
+        .reveal .title-slide { text-align: center; justify-content: center; }
+        .reveal code { background-color: #2d3748; color: #e2e8f0; border-radius: 4px; padding: 4px 8px; font-size: 0.85em; }
+        .reveal pre { box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; margin: 10px 0; width: 100%; background-color: #272822; padding: 0; overflow: visible; }
+        .reveal pre code { padding: 15px; font-size: 0.7em; line-height: 1.2; max-height: 400px; overflow-y: auto; overflow-x: auto; word-wrap: normal; white-space: pre; display: block; background-color: #272822 !important; border: none; color: #f8f8f2 !important; }
+        .reveal .two-column { display: flex; gap: 40px; height: calc(100% - 120px); }
+        .reveal .column { flex: 1; overflow-y: auto; }
+        .reveal .highlight { background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left: 4px solid var(--warning-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .danger { background: linear-gradient(135deg, #f8d7da 0%, #fab1a0 100%); border-left: 4px solid var(--danger-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .success { background: linear-gradient(135deg, #d4edda 0%, #a8e6cf 100%); border-left: 4px solid var(--success-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .k8s-logo { background: var(--k8s-blue); color: white; padding: 10px 20px; border-radius: 8px; display: inline-block; margin: 10px 0; }
+        .reveal ul, .reveal ol { font-size: 0.7em; line-height: 1.2; margin: 0.2em 0 0.2em 0.5em; }
+        .reveal li { margin-bottom: 2px; }
+        .reveal .subtitle { font-size: 1.2em; color: #666; margin-bottom: 40px; }
+        .reveal .emoji { font-size: 1.2em; }
+        .reveal .architecture-diagram { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0; font-family: monospace; font-size: 0.7em; white-space: pre; }
+        .reveal .progress-indicator { position: fixed; top: 20px; right: 20px; background: var(--k8s-blue); color: white; padding: 10px 15px; border-radius: 20px; font-size: 0.7em; z-index: 1000; }
+        .reveal .lab-callout { display: flex; align-items: center; justify-content: center; height: 100%; overflow: auto; padding: 10px; }
+        .reveal .lab-callout h1 { font-size: 1.3em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout h2 { font-size: 1.0em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout h3 { font-size: 0.9em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout ul { font-size: 0.7em; line-height: 1.2; margin: 0.2em 0; }
+        .reveal .lab-callout li { margin: 0.1em 0; }
+        .reveal .lab-callout > div { padding: 8px; max-width: 95%; }
+        .reveal .lab-callout p { margin: 0.2em 0; font-size: 0.9em; }
+        .reveal table { font-size: 0.65em; border-collapse: collapse; width: 100%; }
+        .reveal table th, .reveal table td { padding: 4px 6px; border: 1px solid #ddd; }
+        .reveal table th { background: var(--k8s-blue); color: white; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <section class="title-slide">
+                <h1><span class="emoji">🚀</span> Module 2: Application Deployment</h1>
+                <div class="k8s-logo">Deployments · Rolling Updates · HPA · Helm</div>
+                <p class="subtitle">Shipping changes without downtime</p>
+                <div class="highlight">
+                    <p><strong>📚 In this module:</strong> Deployments as the production-grade Pod wrapper, rolling and blue-green strategies, autoscaling on metrics, and building your own Helm chart.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">📋</span> Module Agenda</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Topics</h3>
+                        <ul>
+                            <li>Deployments and ReplicaSets</li>
+                            <li>Rolling updates &amp; rollback (lab 11)</li>
+                            <li>Blue-green pattern (lab 12)</li>
+                            <li>Horizontal Pod Autoscaler (lab 13)</li>
+                            <li>Building a Helm chart (lab 15)</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Learning Outcomes</h3>
+                        <ul>
+                            <li>Use Deployments instead of bare Pods</li>
+                            <li>Roll out and roll back image changes</li>
+                            <li>Cut traffic between blue and green stacks</li>
+                            <li>Scale on CPU and memory utilization</li>
+                            <li>Author <code>Chart.yaml</code>, <code>values.yaml</code>, and templates</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">📦</span> Deployments: Wrapping Pods for Production</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>The Hierarchy</h3>
+                        <div class="architecture-diagram">Deployment
+   └── ReplicaSet
+         └── Pod, Pod, Pod ...</div>
+                        <ul>
+                            <li>A Deployment owns one or more ReplicaSets</li>
+                            <li>A ReplicaSet keeps N identical Pods running</li>
+                            <li>You almost never create a ReplicaSet directly</li>
+                            <li>Editing a Deployment's <code>spec.template</code> creates a new ReplicaSet</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Minimal Deployment</h3>
+                        <pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: v1
+  template:
+    metadata:
+      labels:
+        app: v1
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.23.0</code></pre>
+                        <div class="highlight"><p><strong>Selector ↔ labels</strong> must match exactly. <code>apps/v1</code> requires the selector to be set.</p></div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🔄</span> Rolling Updates</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Strategy Knobs</h3>
+                        <ul>
+                            <li><code>maxSurge</code> — extra pods allowed above replicas during update</li>
+                            <li><code>maxUnavailable</code> — pods allowed missing during update</li>
+                            <li>Defaults: 25% / 25%</li>
+                            <li>Recreate strategy is the alternative — drop all, then re-create (downtime)</li>
+                        </ul>
+                        <h3>Imperative Update</h3>
+                        <pre><code class="language-bash">kubectl set image deployment/nginx \
+  nginx=nginx:1.23.4
+kubectl rollout status deployment/nginx
+kubectl rollout history deployment/nginx
+kubectl annotate deployment/nginx \
+  kubernetes.io/change-cause="Pick up patch"</code></pre>
+                    </div>
+                    <div class="column">
+                        <h3>Rollback</h3>
+                        <pre><code class="language-bash">kubectl rollout undo deployment/nginx
+kubectl rollout undo deployment/nginx --to-revision=1
+kubectl rollout pause deployment/nginx
+kubectl rollout resume deployment/nginx</code></pre>
+                        <div class="success">
+                            <p><strong>Backward compatibility:</strong> Rolling updates assume v1 and v2 can serve traffic simultaneously. Database schema changes, breaking API changes, or stateful protocols may need blue-green instead.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 11: Rolling Update + Rollback</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Create nginx Deployment at 1.23.0, 3 replicas</li>
+                            <li>✅ Roll to 1.23.4 with a change-cause annotation</li>
+                            <li>✅ Scale to 5 replicas mid-rollout</li>
+                            <li>✅ Roll back to revision 1, verify image is 1.23.0</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/11-deployment-rolling-update/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🟦🟩</span> Blue-Green Deployment</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>How it Works</h3>
+                        <ul>
+                            <li>Two parallel Deployments: <code>nginx-blue</code> + <code>nginx-green</code></li>
+                            <li>Each Pod template carries a <code>version=blue|green</code> label</li>
+                            <li>One Service selects one version at a time</li>
+                            <li>Cutover = change the Service selector</li>
+                            <li>Rollback = flip selector back; old Pods still running</li>
+                        </ul>
+                        <h3>When to Use It</h3>
+                        <ul>
+                            <li>Breaking changes that can't run side-by-side</li>
+                            <li>Need instant rollback (no rollout time)</li>
+                            <li>Willing to pay 2× capacity briefly</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Selector Cutover</h3>
+                        <pre><code class="language-yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  type: ClusterIP
+  selector:
+    version: blue   # ← flip to "green"
+  ports:
+  - port: 80
+    targetPort: 80</code></pre>
+                        <pre><code class="language-bash">kubectl patch service nginx \
+  -p '{"spec":{"selector":{"version":"green"}}}'</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 12: Blue-Green Cutover</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Deploy <code>nginx-blue</code> at 1.23.0</li>
+                            <li>✅ Expose with a ClusterIP Service</li>
+                            <li>✅ Deploy <code>nginx-green</code> at 1.23.4 alongside</li>
+                            <li>✅ Flip Service selector to <code>version: green</code></li>
+                            <li>✅ Decommission blue</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/12-deployment-blue-green/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">📈</span> Horizontal Pod Autoscaler</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>HPA in One Sentence</h3>
+                        <p style="font-size: 0.85em;">Watches a metric (CPU, memory, or custom) and scales replicas of a Deployment up or down to keep the metric inside a target range.</p>
+                        <h3>Requirements</h3>
+                        <ul>
+                            <li>Metrics-server running in the cluster</li>
+                            <li>Pods declare <code>resources.requests</code> — HPA computes utilization vs the request</li>
+                            <li>Use <code>autoscaling/v2</code> for multi-metric HPAs</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Two-Metric HPA</h3>
+                        <pre><code class="language-yaml">apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  minReplicas: 3
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target: {type: Utilization, averageUtilization: 75}
+  - type: Resource
+    resource:
+      name: memory
+      target: {type: Utilization, averageUtilization: 60}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 13: HPA on CPU + Memory</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Deployment with requests/limits declared</li>
+                            <li>✅ HPA <code>autoscaling/v2</code> min 3, max 8</li>
+                            <li>✅ Targets: CPU 75%, memory 60%</li>
+                            <li>✅ Watch replicas scale from 1 → 3 even at idle</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/13-deployment-horizontal-pod-autoscaler/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">⎈</span> Building a Helm Chart</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Chart.yaml (Helm v3)</h3>
+                        <pre><code class="language-yaml">apiVersion: v2     # required for Helm 3
+name: web-app
+version: 2.5.4     # chart semver</code></pre>
+                        <div class="danger">
+                            <p><strong>Pitfall:</strong> <code>apiVersion</code> is <code>v2</code> for Helm 3 charts. Don't confuse it with <em>chart version</em> (<code>2.5.4</code>) or <em>app version</em>.</p>
+                        </div>
+                        <h3>values.yaml</h3>
+                        <pre><code class="language-yaml">service_port: 80
+container_port: 3000</code></pre>
+                    </div>
+                    <div class="column">
+                        <h3>A Template</h3>
+                        <pre><code class="language-yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: hello-world
+  ports:
+  - protocol: TCP
+    port: {{ .Values.service_port }}
+    targetPort: {{ .Values.container_port }}</code></pre>
+                        <pre><code class="language-bash">helm package .
+helm install hello-world . \
+  --namespace app-stack --create-namespace \
+  --set service_port=9090</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 15: Build Your Own Chart</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Author <code>Chart.yaml</code> (apiVersion: v2)</li>
+                            <li>✅ <code>values.yaml</code> with service_port + container_port</li>
+                            <li>✅ Pod template using <code>{{ .Values.container_port }}</code></li>
+                            <li>✅ Service template (ClusterIP, targetPort)</li>
+                            <li>✅ <code>helm package</code> → <code>helm install</code></li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/15-helm-build-chart/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section class="title-slide">
+                <h1><span class="emoji">✅</span> Module 2 Complete</h1>
+                <p class="subtitle">You can deploy, update, autoscale, and package applications.</p>
+                <div class="success" style="font-size: 1.0em;">
+                    <p>Next up: <strong>Module 3 — Observability &amp; Maintenance.</strong> Probes, metrics, debugging, and the long road of API deprecation.</p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/notes/notes.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true, controls: true, progress: true, center: false,
+            keyboard: true, overview: true, transition: 'slide',
+            backgroundTransition: 'fade', fragments: true,
+            plugins: [ RevealHighlight, RevealNotes ],
+            highlight: { highlightOnLoad: true, theme: 'monokai' }
+        });
+        const progressIndicator = document.createElement('div');
+        progressIndicator.className = 'progress-indicator';
+        progressIndicator.textContent = 'Module 2 / 5';
+        document.body.appendChild(progressIndicator);
+    </script>
+</body>
+</html>

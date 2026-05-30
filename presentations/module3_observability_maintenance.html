@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3: Observability &amp; Maintenance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/white.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/monokai.min.css">
+    <style>
+        :root { --k8s-blue: #326ce5; --k8s-light: #4285f4; --success-color: #28a745; --warning-color: #ffc107; --danger-color: #dc3545; }
+        .reveal { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 30px; font-weight: 300; color: #2c3e50; overflow: hidden; }
+        .reveal h1, .reveal h2, .reveal h3 { color: var(--k8s-blue); margin-bottom: 0.5em; }
+        .reveal h1 { font-size: 1.7em; margin-bottom: 0.2em; }
+        .reveal h2 { font-size: 1.3em; margin-bottom: 0.2em; }
+        .reveal h3 { font-size: 1.0em; margin-bottom: 0.1em; }
+        .reveal .slides section { text-align: left; display: flex; flex-direction: column; justify-content: flex-start; padding: 10px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; max-height: 100vh; }
+        .reveal .slides { height: 100%; width: 100%; }
+        .reveal .title-slide { text-align: center; justify-content: center; }
+        .reveal code { background-color: #2d3748; color: #e2e8f0; border-radius: 4px; padding: 4px 8px; font-size: 0.85em; }
+        .reveal pre { box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; margin: 10px 0; width: 100%; background-color: #272822; padding: 0; overflow: visible; }
+        .reveal pre code { padding: 15px; font-size: 0.7em; line-height: 1.2; max-height: 400px; overflow-y: auto; overflow-x: auto; word-wrap: normal; white-space: pre; display: block; background-color: #272822 !important; border: none; color: #f8f8f2 !important; }
+        .reveal .two-column { display: flex; gap: 40px; height: calc(100% - 120px); }
+        .reveal .column { flex: 1; overflow-y: auto; }
+        .reveal .highlight { background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left: 4px solid var(--warning-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .danger { background: linear-gradient(135deg, #f8d7da 0%, #fab1a0 100%); border-left: 4px solid var(--danger-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .success { background: linear-gradient(135deg, #d4edda 0%, #a8e6cf 100%); border-left: 4px solid var(--success-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .k8s-logo { background: var(--k8s-blue); color: white; padding: 10px 20px; border-radius: 8px; display: inline-block; margin: 10px 0; }
+        .reveal ul, .reveal ol { font-size: 0.7em; line-height: 1.2; margin: 0.2em 0 0.2em 0.5em; }
+        .reveal li { margin-bottom: 2px; }
+        .reveal .subtitle { font-size: 1.2em; color: #666; margin-bottom: 40px; }
+        .reveal .emoji { font-size: 1.2em; }
+        .reveal .architecture-diagram { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0; font-family: monospace; font-size: 0.7em; white-space: pre; }
+        .reveal .progress-indicator { position: fixed; top: 20px; right: 20px; background: var(--k8s-blue); color: white; padding: 10px 15px; border-radius: 20px; font-size: 0.7em; z-index: 1000; }
+        .reveal .lab-callout { display: flex; align-items: center; justify-content: center; height: 100%; overflow: auto; padding: 10px; }
+        .reveal .lab-callout h1 { font-size: 1.3em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout h2 { font-size: 1.0em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout h3 { font-size: 0.9em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout ul { font-size: 0.7em; line-height: 1.2; margin: 0.2em 0; }
+        .reveal .lab-callout li { margin: 0.1em 0; }
+        .reveal .lab-callout > div { padding: 8px; max-width: 95%; }
+        .reveal .lab-callout p { margin: 0.2em 0; font-size: 0.9em; }
+        .reveal table { font-size: 0.65em; border-collapse: collapse; width: 100%; }
+        .reveal table th, .reveal table td { padding: 4px 6px; border: 1px solid #ddd; }
+        .reveal table th { background: var(--k8s-blue); color: white; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <section class="title-slide">
+                <h1><span class="emoji">🔍</span> Module 3: Observability &amp; Maintenance</h1>
+                <div class="k8s-logo">Labels · API Deprecation · Probes · Metrics · Debugging</div>
+                <p class="subtitle">Knowing what your workloads are doing — and fixing them when they aren't</p>
+                <div class="highlight">
+                    <p><strong>📚 In this module:</strong> Organizing resources with labels, navigating the deprecation cycle, wiring health probes, reading metrics, and debugging broken Pods.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">📋</span> Module Agenda</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Topics</h3>
+                        <ul>
+                            <li>Labels &amp; annotations (lab 10)</li>
+                            <li>API deprecation policy (lab 16)</li>
+                            <li>Liveness, readiness, startup probes (lab 17)</li>
+                            <li>Metrics-server + <code>kubectl top</code> (lab 18)</li>
+                            <li>Pod debugging techniques (lab 19)</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Learning Outcomes</h3>
+                        <ul>
+                            <li>Query and filter resources with selectors</li>
+                            <li>Recognize and migrate deprecated APIs</li>
+                            <li>Distinguish liveness vs readiness vs startup</li>
+                            <li>Use metrics to spot resource pressure</li>
+                            <li>Pull useful info out of broken or distroless Pods</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🏷️</span> Labels and Annotations</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Labels — Identifying Metadata</h3>
+                        <ul>
+                            <li>Key/value pairs <em>used by selectors</em></li>
+                            <li>Drive Service routing, Deployment ownership, RBAC scoping</li>
+                            <li>Should describe identity, not implementation</li>
+                            <li>Example: <code>env=prod</code>, <code>team=shiny</code>, <code>app=v1.2.4</code></li>
+                        </ul>
+                        <h3>Annotations — Non-Identifying Metadata</h3>
+                        <ul>
+                            <li>Same key/value shape, but <em>not selectable</em></li>
+                            <li>For tooling: contact info, build SHA, ingress hints</li>
+                            <li>Example: <code>contact=John Doe</code>, <code>commit=2d3mg3</code></li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>CLI Cheat-sheet</h3>
+                        <pre><code class="language-bash"># Add and remove labels
+kubectl label pod frontend env=prod team=shiny
+kubectl label pod backend env-          # remove
+
+# Selectors
+kubectl get pods -l env=prod
+kubectl get pods -l 'team in (shiny,legacy)'
+kubectl get pods --show-labels
+
+# Annotations
+kubectl annotate pod frontend \
+  contact="John Doe" commit=2d3mg3
+kubectl get pods -o yaml | grep -C 3 annotations:</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 10: Labels &amp; Annotations CLI</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Create three Pods: frontend, backend, database</li>
+                            <li>✅ Assign required labels per Pod</li>
+                            <li>✅ Add annotations to frontend + backend</li>
+                            <li>✅ Filter with set-based selectors</li>
+                            <li>✅ Strip a label and re-query</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/10-labels-annotations-cli/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">⚠️</span> API Deprecation &amp; Migration</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Why APIs Change</h3>
+                        <ul>
+                            <li>Stable (v1) APIs get long-term guarantees</li>
+                            <li>Beta (v1beta1, v2beta2) APIs can change or be removed</li>
+                            <li>Major workloads transitioned from <code>extensions/v1beta1</code> &rarr; <code>apps/v1</code></li>
+                            <li>Ingress moved <code>networking.k8s.io/v1beta1</code> &rarr; <code>networking.k8s.io/v1</code></li>
+                            <li>HPA: <code>autoscaling/v1</code> &rarr; <code>v2beta1</code> &rarr; <code>v2</code></li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>How to Find Trouble</h3>
+                        <pre><code class="language-bash"># See available API versions on the cluster
+kubectl api-versions
+
+# Get the GVR of an existing resource
+kubectl explain deployment
+
+# Run kubectl convert to migrate old YAML
+kubectl convert -f deployment.yaml \
+  --output-version apps/v1</code></pre>
+                        <div class="danger">
+                            <p>When <code>apps/v1</code> replaced beta versions, <code>spec.selector.matchLabels</code> became <em>required</em>. Old beta manifests will fail to apply without it.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 16: Fix a Deprecated Deployment</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Attempt to apply <code>apps/v1beta2</code> manifest</li>
+                            <li>✅ Identify the failure reason</li>
+                            <li>✅ Migrate to <code>apps/v1</code></li>
+                            <li>✅ Add the required <code>spec.selector.matchLabels</code></li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/16-api-deprecation/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">❤️‍🩹</span> Pod Probes</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Three Probe Types</h3>
+                        <ul>
+                            <li><strong>readiness</strong> — should this Pod receive traffic right now?</li>
+                            <li><strong>liveness</strong> — is this Pod still healthy or should kubelet restart it?</li>
+                            <li><strong>startup</strong> — give a slow-starting app extra time before liveness kicks in</li>
+                        </ul>
+                        <h3>Probe Mechanisms</h3>
+                        <ul>
+                            <li><code>httpGet</code> — HTTP GET to a path/port</li>
+                            <li><code>tcpSocket</code> — TCP connect attempt</li>
+                            <li><code>exec</code> — run a command, expect exit 0</li>
+                            <li><code>grpc</code> — for gRPC health protocol</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Tuning Knobs</h3>
+                        <ul>
+                            <li><code>initialDelaySeconds</code> — wait before first probe</li>
+                            <li><code>periodSeconds</code> — how often</li>
+                            <li><code>timeoutSeconds</code> — probe timeout</li>
+                            <li><code>failureThreshold</code> — consecutive fails before action</li>
+                            <li><code>successThreshold</code> — required successes after failure</li>
+                        </ul>
+                        <pre><code class="language-yaml">readinessProbe:
+  httpGet: {path: /, port: nodejs-port}
+  initialDelaySeconds: 2
+livenessProbe:
+  httpGet: {path: /, port: nodejs-port}
+  initialDelaySeconds: 5
+  periodSeconds: 8</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 17: Wire Up Readiness + Liveness</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Pod <code>hello</code> with image bmuschko/nodejs-hello-world:1.0.0</li>
+                            <li>✅ Named port <code>nodejs-port</code> on 3000</li>
+                            <li>✅ Readiness: path <code>/</code>, initialDelay 2s</li>
+                            <li>✅ Liveness: every 8s with initialDelay 5s</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/17-pod-probes/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">📊</span> Metrics + <code>kubectl top</code></h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>How Metrics Flow</h3>
+                        <div class="architecture-diagram">kubelet (cAdvisor)
+       │
+       ▼
+metrics-server (kube-system)
+       │
+       ▼
+metrics.k8s.io API
+       │
+       ▼
+kubectl top / HPA</div>
+                        <ul>
+                            <li>metrics-server polls every 15s by default</li>
+                            <li>Metrics are <em>not persisted</em> — that's Prometheus' job</li>
+                            <li>HPA scaling decisions read this same API</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Common Commands</h3>
+                        <pre><code class="language-bash">kubectl top nodes
+kubectl top pods
+kubectl top pods -n stress-test
+kubectl top pods --sort-by=memory
+
+# Sort and pick the heaviest
+kubectl top pods -n stress-test \
+  --sort-by=memory --no-headers | head -1</code></pre>
+                        <div class="highlight">
+                            <p>If <code>kubectl top</code> errors out, check that metrics-server is running: <code>kubectl -n kube-system get deploy metrics-server</code>.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 18: Identify the Hungriest Pod</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Create namespace <code>stress-test</code></li>
+                            <li>✅ Apply three stress pods with memory limits</li>
+                            <li>✅ Use <code>kubectl top</code> to find max-memory consumer</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/18-pod-metrics/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🐛</span> Debugging Pods</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Triage Order</h3>
+                        <ol>
+                            <li><code>kubectl get pods</code> — phase &amp; restart count</li>
+                            <li><code>kubectl describe pod &lt;name&gt;</code> — events at the bottom</li>
+                            <li><code>kubectl logs &lt;name&gt;</code> (and <code>-p</code> for the previous container)</li>
+                            <li><code>kubectl exec -it &lt;name&gt; -- sh</code></li>
+                            <li><code>kubectl debug</code> for distroless or stuck Pods</li>
+                        </ol>
+                    </div>
+                    <div class="column">
+                        <h3>kubectl debug</h3>
+                        <pre><code class="language-bash"># Attach a debug container that shares process namespace
+kubectl debug -it &lt;pod&gt; \
+  --image=busybox:1.36 \
+  --share-processes \
+  --copy-to=&lt;pod&gt;-debug</code></pre>
+                        <div class="success">
+                            <p><strong>Why <code>--share-processes</code>?</strong> Without it you can only see the debug container's own processes. With it, you can <code>ps aux</code> and see the broken app.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 19: Debug a Broken Distroless Pod</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Apply pod with deliberate path bug</li>
+                            <li>✅ Discover ENOENT in logs</li>
+                            <li>✅ Try <code>kubectl exec</code> — fails (no shell)</li>
+                            <li>✅ Use <code>kubectl debug</code> to diagnose</li>
+                            <li>✅ Fix path + add an <code>emptyDir</code> mount</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/19-troubleshooting-pod/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section class="title-slide">
+                <h1><span class="emoji">✅</span> Module 3 Complete</h1>
+                <p class="subtitle">You can see what your workloads are doing — and fix them.</p>
+                <div class="success" style="font-size: 1.0em;">
+                    <p>Next up: <strong>Module 4 — Environment, Config &amp; Security.</strong> CRDs, RBAC, resource limits, ConfigMaps, Secrets, securityContext.</p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/notes/notes.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true, controls: true, progress: true, center: false,
+            keyboard: true, overview: true, transition: 'slide',
+            backgroundTransition: 'fade', fragments: true,
+            plugins: [ RevealHighlight, RevealNotes ],
+            highlight: { highlightOnLoad: true, theme: 'monokai' }
+        });
+        const progressIndicator = document.createElement('div');
+        progressIndicator.className = 'progress-indicator';
+        progressIndicator.textContent = 'Module 3 / 5';
+        document.body.appendChild(progressIndicator);
+    </script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 5: Services &amp; Networking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/white.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/monokai.min.css">
+    <style>
+        :root { --k8s-blue: #326ce5; --k8s-light: #4285f4; --success-color: #28a745; --warning-color: #ffc107; --danger-color: #dc3545; }
+        .reveal { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 30px; font-weight: 300; color: #2c3e50; overflow: hidden; }
+        .reveal h1, .reveal h2, .reveal h3 { color: var(--k8s-blue); margin-bottom: 0.5em; }
+        .reveal h1 { font-size: 1.7em; margin-bottom: 0.2em; }
+        .reveal h2 { font-size: 1.3em; margin-bottom: 0.2em; }
+        .reveal h3 { font-size: 1.0em; margin-bottom: 0.1em; }
+        .reveal .slides section { text-align: left; display: flex; flex-direction: column; justify-content: flex-start; padding: 10px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; max-height: 100vh; }
+        .reveal .slides { height: 100%; width: 100%; }
+        .reveal .title-slide { text-align: center; justify-content: center; }
+        .reveal code { background-color: #2d3748; color: #e2e8f0; border-radius: 4px; padding: 4px 8px; font-size: 0.85em; }
+        .reveal pre { box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; margin: 10px 0; width: 100%; background-color: #272822; padding: 0; overflow: visible; }
+        .reveal pre code { padding: 15px; font-size: 0.7em; line-height: 1.2; max-height: 400px; overflow-y: auto; overflow-x: auto; word-wrap: normal; white-space: pre; display: block; background-color: #272822 !important; border: none; color: #f8f8f2 !important; }
+        .reveal .two-column { display: flex; gap: 40px; height: calc(100% - 120px); }
+        .reveal .column { flex: 1; overflow-y: auto; }
+        .reveal .highlight { background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left: 4px solid var(--warning-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .danger { background: linear-gradient(135deg, #f8d7da 0%, #fab1a0 100%); border-left: 4px solid var(--danger-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .success { background: linear-gradient(135deg, #d4edda 0%, #a8e6cf 100%); border-left: 4px solid var(--success-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .k8s-logo { background: var(--k8s-blue); color: white; padding: 10px 20px; border-radius: 8px; display: inline-block; margin: 10px 0; }
+        .reveal ul, .reveal ol { font-size: 0.7em; line-height: 1.2; margin: 0.2em 0 0.2em 0.5em; }
+        .reveal li { margin-bottom: 2px; }
+        .reveal .subtitle { font-size: 1.2em; color: #666; margin-bottom: 40px; }
+        .reveal .emoji { font-size: 1.2em; }
+        .reveal .architecture-diagram { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0; font-family: monospace; font-size: 0.7em; white-space: pre; }
+        .reveal .progress-indicator { position: fixed; top: 20px; right: 20px; background: var(--k8s-blue); color: white; padding: 10px 15px; border-radius: 20px; font-size: 0.7em; z-index: 1000; }
+        .reveal .lab-callout { display: flex; align-items: center; justify-content: center; height: 100%; overflow: auto; padding: 10px; }
+        .reveal .lab-callout h1 { font-size: 1.3em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout h2 { font-size: 1.0em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout h3 { font-size: 0.9em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout ul { font-size: 0.7em; line-height: 1.2; margin: 0.2em 0; }
+        .reveal .lab-callout li { margin: 0.1em 0; }
+        .reveal .lab-callout > div { padding: 8px; max-width: 95%; }
+        .reveal .lab-callout p { margin: 0.2em 0; font-size: 0.9em; }
+        .reveal table { font-size: 0.65em; border-collapse: collapse; width: 100%; }
+        .reveal table th, .reveal table td { padding: 4px 6px; border: 1px solid #ddd; }
+        .reveal table th { background: var(--k8s-blue); color: white; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <section class="title-slide">
+                <h1><span class="emoji">🌐</span> Module 5: Services &amp; Networking</h1>
+                <div class="k8s-logo">Services · Ingress · NetworkPolicy</div>
+                <p class="subtitle">Stable endpoints, external access, and traffic policy</p>
+                <div class="highlight">
+                    <p><strong>📚 In this module:</strong> How Pods get stable IPs, how external traffic reaches them, and how to lock down Pod-to-Pod communication.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">📋</span> Module Agenda</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Topics</h3>
+                        <ul>
+                            <li>Services: ClusterIP, NodePort, LoadBalancer (lab 28)</li>
+                            <li>Troubleshooting Services (lab 29)</li>
+                            <li>Ingress: host &amp; path routing (lab 30)</li>
+                            <li>NetworkPolicy: pod- and namespace-selectors (lab 31)</li>
+                            <li>CKAD exam tips</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Learning Outcomes</h3>
+                        <ul>
+                            <li>Pick the right Service type for the job</li>
+                            <li>Debug selector and port mismatches</li>
+                            <li>Author current-spec Ingress (v1, pathType)</li>
+                            <li>Default-deny with NetworkPolicy and selectively allow traffic</li>
+                            <li>Walk into the exam with a checklist</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🔌</span> Services</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>The Problem They Solve</h3>
+                        <ul>
+                            <li>Pods are ephemeral — IPs change on restart</li>
+                            <li>Services give a <em>stable</em> virtual IP that load-balances to current Pods</li>
+                            <li>Selector matches Pod labels → endpoints</li>
+                        </ul>
+                        <h3>Service Types</h3>
+                        <table>
+                            <thead><tr><th>Type</th><th>Reachable from</th></tr></thead>
+                            <tbody>
+                                <tr><td>ClusterIP</td><td>inside the cluster</td></tr>
+                                <tr><td>NodePort</td><td>node IP : 30000-32767</td></tr>
+                                <tr><td>LoadBalancer</td><td>cloud LB (external)</td></tr>
+                                <tr><td>ExternalName</td><td>DNS CNAME to external host</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="column">
+                        <h3>ClusterIP Manifest</h3>
+                        <pre><code class="language-yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+spec:
+  type: ClusterIP
+  selector:
+    app: myapp
+  ports:
+  - protocol: TCP
+    port: 80         # Service port
+    targetPort: 80   # Pod port</code></pre>
+                        <div class="highlight">
+                            <p><code>kubectl expose deployment myapp --port=80 --target-port=80</code> generates the manifest above.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 28: ClusterIP and NodePort</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Deployment <code>myapp</code>, 2 replicas, nginx</li>
+                            <li>✅ Expose as ClusterIP</li>
+                            <li>✅ Expose as NodePort variant on a different port</li>
+                            <li>✅ Verify reachability from a curl Pod</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/28-service/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🔧</span> Troubleshooting Services</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>If a Service Doesn't Work, Check…</h3>
+                        <ol>
+                            <li><code>kubectl get endpoints &lt;svc&gt;</code> — empty means selector didn't match</li>
+                            <li>Service selector labels vs Pod labels</li>
+                            <li><code>targetPort</code> matches the actual container port</li>
+                            <li>protocol (TCP vs UDP)</li>
+                            <li>NetworkPolicy isn't blocking traffic</li>
+                            <li>Pod is in Running state</li>
+                        </ol>
+                    </div>
+                    <div class="column">
+                        <h3>Useful Probes from Inside</h3>
+                        <pre><code class="language-bash"># Throwaway pod for testing
+kubectl run probe --rm -it --restart=Never \
+  --image=alpine/curl:3.14 -- sh
+
+# Inside:
+curl http://myapp:80
+nslookup myapp
+curl http://myapp.default.svc.cluster.local</code></pre>
+                        <div class="danger">
+                            <p><strong>Most common bug:</strong> the Service selector says <code>run: myapp</code> but the Deployment template says <code>app: myapp</code>. <code>kubectl describe svc</code> shows the empty endpoints.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 29: Fix a Broken Service</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Apply the deliberately-broken setup</li>
+                            <li>✅ Reproduce the connectivity failure</li>
+                            <li>✅ Identify selector + targetPort bugs</li>
+                            <li>✅ Patch and verify</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/29-troubleshooting-service/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🚪</span> Ingress</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Ingress vs Service</h3>
+                        <ul>
+                            <li>Service load-balances at L4</li>
+                            <li>Ingress routes at L7 — by host and path</li>
+                            <li>Implemented by an <strong>Ingress Controller</strong> (e.g. ingress-nginx) — you must install one</li>
+                            <li>Same Ingress resource works across controllers</li>
+                        </ul>
+                        <h3>Current Spec</h3>
+                        <ul>
+                            <li><code>apiVersion: networking.k8s.io/v1</code></li>
+                            <li><code>pathType: Prefix | Exact | ImplementationSpecific</code> — required</li>
+                            <li><code>backend.service.name</code> + <code>backend.service.port.number</code> (not the old serviceName/servicePort)</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <pre><code class="language-yaml">apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-world-ingress
+spec:
+  rules:
+  - host: hello-world.exposed
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web
+            port:
+              number: 3000</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 30: Ingress with Host Routing</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Install the ingress-nginx controller</li>
+                            <li>✅ Deployment, Service, and Ingress</li>
+                            <li>✅ Route <code>hello-world.exposed</code> &rarr; web Service</li>
+                            <li>✅ Test via curl with a Host header</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/30-ingress/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🚧</span> NetworkPolicy</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Default Posture</h3>
+                        <ul>
+                            <li>Without any NetworkPolicy, all Pods can talk to all Pods</li>
+                            <li>A NetworkPolicy <em>selects</em> Pods and defines what's allowed</li>
+                            <li>The moment a Pod is selected by <em>any</em> policy, it becomes "isolated" — only explicitly allowed traffic gets through</li>
+                            <li>Requires a network plugin that supports NetworkPolicy (Calico, Cilium, etc.)</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Anatomy</h3>
+                        <pre><code class="language-yaml">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-consumer
+  namespace: k2
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes: [Ingress]
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          role: consumer
+    ports:
+    - protocol: TCP
+      port: 80</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 31: Default Deny + Selective Allow</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Namespaces k1 (consumer) and k2 (producer)</li>
+                            <li>✅ Default-deny ingress in k2</li>
+                            <li>✅ Confirm traffic from k1 fails</li>
+                            <li>✅ Allow ingress from <code>role: consumer</code> only</li>
+                            <li>✅ Confirm traffic succeeds</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/31-networkpolicy/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🎯</span> CKAD Exam Tips</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Before the Exam</h3>
+                        <ul>
+                            <li>Memorize the <code>kubectl run --dry-run=client -o yaml</code> stub</li>
+                            <li>Set up your <code>kubectl</code> aliases: <code>k</code>, <code>kn</code>, <code>kgp</code></li>
+                            <li>Bookmark these sections of kubernetes.io: Pods, Deployments, Services, Ingress, RBAC</li>
+                            <li>Know <code>kubectl explain &lt;kind&gt;.&lt;field&gt;</code> — your offline schema reference</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>During the Exam</h3>
+                        <ul>
+                            <li>Flag hard questions and come back — never burn 15 minutes on one</li>
+                            <li>Use <code>--namespace</code> in every command unless default is set</li>
+                            <li>Read <em>all</em> the requirements in a question before starting</li>
+                            <li>Verify with <code>kubectl get</code> after every change</li>
+                            <li>Time check at the 60-minute mark</li>
+                        </ul>
+                        <div class="success">
+                            <p><strong>Passing score is 66%.</strong> You don't need perfection — you need accuracy on the questions you do attempt.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="title-slide">
+                <h1><span class="emoji">🏁</span> Course Complete</h1>
+                <p class="subtitle">31 hands-on labs across all five CKAD domains.</p>
+                <div class="success" style="font-size: 1.1em;">
+                    <p>You've stood up a cluster, deployed applications, managed configuration, secured workloads, and connected services. You're ready for the exam.</p>
+                </div>
+                <div class="highlight" style="margin-top: 20px;">
+                    <p><strong>📚 Keep practicing:</strong> Re-run the labs without looking at the solutions. Time yourself. Aim to complete each in under 10 minutes.</p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/notes/notes.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true, controls: true, progress: true, center: false,
+            keyboard: true, overview: true, transition: 'slide',
+            backgroundTransition: 'fade', fragments: true,
+            plugins: [ RevealHighlight, RevealNotes ],
+            highlight: { highlightOnLoad: true, theme: 'monokai' }
+        });
+        const progressIndicator = document.createElement('div');
+        progressIndicator.className = 'progress-indicator';
+        progressIndicator.textContent = 'Module 5 / 5';
+        document.body.appendChild(progressIndicator);
+    </script>
+</body>
+</html>

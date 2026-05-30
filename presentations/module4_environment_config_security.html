@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 4: Environment, Config &amp; Security</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/white.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/monokai.min.css">
+    <style>
+        :root { --k8s-blue: #326ce5; --k8s-light: #4285f4; --success-color: #28a745; --warning-color: #ffc107; --danger-color: #dc3545; }
+        .reveal { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 30px; font-weight: 300; color: #2c3e50; overflow: hidden; }
+        .reveal h1, .reveal h2, .reveal h3 { color: var(--k8s-blue); margin-bottom: 0.5em; }
+        .reveal h1 { font-size: 1.7em; margin-bottom: 0.2em; }
+        .reveal h2 { font-size: 1.3em; margin-bottom: 0.2em; }
+        .reveal h3 { font-size: 1.0em; margin-bottom: 0.1em; }
+        .reveal .slides section { text-align: left; display: flex; flex-direction: column; justify-content: flex-start; padding: 10px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; max-height: 100vh; }
+        .reveal .slides { height: 100%; width: 100%; }
+        .reveal .title-slide { text-align: center; justify-content: center; }
+        .reveal code { background-color: #2d3748; color: #e2e8f0; border-radius: 4px; padding: 4px 8px; font-size: 0.85em; }
+        .reveal pre { box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; margin: 10px 0; width: 100%; background-color: #272822; padding: 0; overflow: visible; }
+        .reveal pre code { padding: 15px; font-size: 0.7em; line-height: 1.2; max-height: 400px; overflow-y: auto; overflow-x: auto; word-wrap: normal; white-space: pre; display: block; background-color: #272822 !important; border: none; color: #f8f8f2 !important; }
+        .reveal .two-column { display: flex; gap: 40px; height: calc(100% - 120px); }
+        .reveal .column { flex: 1; overflow-y: auto; }
+        .reveal .highlight { background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left: 4px solid var(--warning-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .danger { background: linear-gradient(135deg, #f8d7da 0%, #fab1a0 100%); border-left: 4px solid var(--danger-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .success { background: linear-gradient(135deg, #d4edda 0%, #a8e6cf 100%); border-left: 4px solid var(--success-color); padding: 4px 8px; margin: 4px 0; border-radius: 4px; font-size: 0.7em; line-height: 1.2; }
+        .reveal .k8s-logo { background: var(--k8s-blue); color: white; padding: 10px 20px; border-radius: 8px; display: inline-block; margin: 10px 0; }
+        .reveal ul, .reveal ol { font-size: 0.7em; line-height: 1.2; margin: 0.2em 0 0.2em 0.5em; }
+        .reveal li { margin-bottom: 2px; }
+        .reveal .subtitle { font-size: 1.2em; color: #666; margin-bottom: 40px; }
+        .reveal .emoji { font-size: 1.2em; }
+        .reveal .architecture-diagram { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0; font-family: monospace; font-size: 0.7em; white-space: pre; }
+        .reveal .progress-indicator { position: fixed; top: 20px; right: 20px; background: var(--k8s-blue); color: white; padding: 10px 15px; border-radius: 20px; font-size: 0.7em; z-index: 1000; }
+        .reveal .lab-callout { display: flex; align-items: center; justify-content: center; height: 100%; overflow: auto; padding: 10px; }
+        .reveal .lab-callout h1 { font-size: 1.3em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout h2 { font-size: 1.0em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout h3 { font-size: 0.9em; margin-bottom: 0.1em; line-height: 1.2; }
+        .reveal .lab-callout ul { font-size: 0.7em; line-height: 1.2; margin: 0.2em 0; }
+        .reveal .lab-callout li { margin: 0.1em 0; }
+        .reveal .lab-callout > div { padding: 8px; max-width: 95%; }
+        .reveal .lab-callout p { margin: 0.2em 0; font-size: 0.9em; }
+        .reveal table { font-size: 0.65em; border-collapse: collapse; width: 100%; }
+        .reveal table th, .reveal table td { padding: 4px 6px; border: 1px solid #ddd; }
+        .reveal table th { background: var(--k8s-blue); color: white; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <section class="title-slide">
+                <h1><span class="emoji">🔐</span> Module 4: Environment, Config &amp; Security</h1>
+                <div class="k8s-logo">CRDs · RBAC · Resources · ConfigMaps · Secrets · SecurityContext</div>
+                <p class="subtitle">Constraining and configuring workloads — the biggest CKAD domain</p>
+                <div class="highlight">
+                    <p><strong>📚 In this module:</strong> Extending the API, granting permissions, capping resources, decoupling configuration, securing the runtime. 8 labs.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">📋</span> Module Agenda</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <ul>
+                            <li>CustomResourceDefinitions (lab 20)</li>
+                            <li>RBAC + ServiceAccounts (lab 21)</li>
+                            <li>Resource requests &amp; limits (lab 22)</li>
+                            <li>ResourceQuota (lab 23)</li>
+                            <li>LimitRange (lab 24)</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <ul>
+                            <li>ConfigMaps (lab 25)</li>
+                            <li>Secrets (lab 26)</li>
+                            <li>Security context (lab 27)</li>
+                        </ul>
+                        <div class="success" style="margin-top: 15px;">
+                            <p><strong>Domain weight:</strong> 25% of the CKAD exam — the largest single block. Spend time here.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🧬</span> CustomResourceDefinitions</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Extending the API</h3>
+                        <ul>
+                            <li>A CRD defines a new resource kind</li>
+                            <li>Cluster users can then create instances of that kind via kubectl, like any built-in</li>
+                            <li>Operators add controllers that <em>act</em> on the resource</li>
+                            <li>API path: <code>/apis/&lt;group&gt;/&lt;version&gt;</code></li>
+                        </ul>
+                        <h3>Modern CRD apiVersion</h3>
+                        <div class="danger">
+                            <p>Always use <code>apiextensions.k8s.io/v1</code>. The beta version was removed in Kubernetes 1.22.</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <pre><code class="language-yaml">apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: backups.example.com
+spec:
+  group: example.com
+  scope: Namespaced
+  names:
+    kind: Backup
+    singular: backup
+    plural: backups
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              cronExpression: {type: string}
+              podName: {type: string}
+              path: {type: string}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 20: Define + Use a CRD</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Author a CRD for <code>kind: Backup</code></li>
+                            <li>✅ Three string properties</li>
+                            <li>✅ Apply and confirm with <code>kubectl get crd</code></li>
+                            <li>✅ Create an instance with cronExpression, podName, path</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/20-crd/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🛡️</span> RBAC + ServiceAccounts</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Four Building Blocks</h3>
+                        <ul>
+                            <li><strong>ServiceAccount</strong> — identity for Pods</li>
+                            <li><strong>Role / ClusterRole</strong> — set of allowed verbs on resources</li>
+                            <li><strong>RoleBinding</strong> — namespace-scoped attachment of a Role to a subject</li>
+                            <li><strong>ClusterRoleBinding</strong> — cluster-wide attachment</li>
+                        </ul>
+                        <h3>Subject Types</h3>
+                        <ul>
+                            <li>ServiceAccount (most common in-cluster)</li>
+                            <li>User &amp; Group (external identity)</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <pre><code class="language-yaml">apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: list-services-clusterrole
+rules:
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sa-services-rb
+  namespace: t23
+subjects:
+- kind: ServiceAccount
+  name: api-call
+  namespace: t23
+roleRef:
+  kind: ClusterRole
+  name: list-services-clusterrole
+  apiGroup: rbac.authorization.k8s.io</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 21: ServiceAccount Calls the API</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Namespace <code>t23</code>, SA <code>api-call</code></li>
+                            <li>✅ ClusterRole to list services</li>
+                            <li>✅ RoleBinding tying SA → ClusterRole</li>
+                            <li>✅ Pod uses SA + curl to the API server with its token</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/21-rbac-serviceaccount/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">⚖️</span> Resource Requests &amp; Limits</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Two Numbers per Resource</h3>
+                        <ul>
+                            <li><strong>requests</strong> — what the scheduler reserves</li>
+                            <li><strong>limits</strong> — hard cap the runtime enforces</li>
+                            <li>CPU: throttled if over limit</li>
+                            <li>Memory: <em>OOMKilled</em> if over limit</li>
+                        </ul>
+                        <h3>Why It Matters</h3>
+                        <ul>
+                            <li>Without requests, scheduler can't pack nodes</li>
+                            <li>Without limits, one Pod can starve neighbors</li>
+                            <li>HPA needs requests to compute utilization</li>
+                            <li>QoS class is derived from requests vs limits</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <pre><code class="language-yaml">spec:
+  containers:
+  - name: hello-world
+    image: bmuschko/nodejs-hello-world:1.0.0
+    resources:
+      requests:
+        cpu: 100m
+        memory: 500Mi
+        ephemeral-storage: 1Gi
+      limits:
+        memory: 500Mi
+        ephemeral-storage: 2Gi</code></pre>
+                        <div class="highlight">
+                            <p><strong>QoS classes:</strong> Guaranteed (requests==limits everywhere), Burstable (requests &lt; limits), BestEffort (neither). Evicted in reverse order under pressure.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 22: Requests + Limits</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Pod <code>hello-world</code> with full resource spec</li>
+                            <li>✅ Volume <code>emptyDir</code> mounted at <code>/var/log</code></li>
+                            <li>✅ Inspect Pod placement node</li>
+                            <li>✅ Confirm requests/limits via <code>kubectl describe</code></li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/22-resource-requests-limits/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🚧</span> ResourceQuota &amp; LimitRange</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>ResourceQuota — namespace-level cap</h3>
+                        <ul>
+                            <li>Caps total <em>requests</em> and <em>limits</em> across the namespace</li>
+                            <li>Caps object counts: pods, services, PVCs, etc.</li>
+                            <li>If a new Pod would exceed quota, creation is rejected</li>
+                        </ul>
+                        <pre><code class="language-yaml">apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: app
+spec:
+  hard:
+    pods: "2"
+    requests.cpu: "2"
+    requests.memory: 500Mi</code></pre>
+                    </div>
+                    <div class="column">
+                        <h3>LimitRange — per-Pod/Container constraints</h3>
+                        <ul>
+                            <li>Sets min, max, and default requests/limits</li>
+                            <li>Pods missing requests get the defaults applied</li>
+                            <li>Pods exceeding max are rejected at admission</li>
+                        </ul>
+                        <pre><code class="language-yaml">apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-limit-range
+spec:
+  limits:
+  - type: Container
+    min: {cpu: "200m"}
+    max: {cpu: "500m"}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 23: ResourceQuota</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Create a quota: 2 pods, 2 CPU, 500Mi memory</li>
+                            <li>✅ Attempt a Pod that exceeds memory → rejected</li>
+                            <li>✅ Reduce request, retry → admitted</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/23-resourcequota/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 24: LimitRange Scenarios</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ LimitRange CPU 200m min, 500m max</li>
+                            <li>✅ Pod with no requests → defaults applied</li>
+                            <li>✅ Pod requesting 1.5 CPU → rejected</li>
+                            <li>✅ Pod in range → admitted</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/24-limitrange/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">📝</span> ConfigMaps</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>What &amp; Why</h3>
+                        <ul>
+                            <li>Decouples non-secret configuration from images</li>
+                            <li>Same image, different ConfigMaps → different environments</li>
+                            <li>Consumed as: env vars, command-line args, or files in a volume</li>
+                            <li>Updates to the ConfigMap are seen by Pods when consumed as a volume (eventually); env vars are <em>not</em> updated</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <pre><code class="language-yaml">apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  application.yaml: |
+    environment: prod
+    feature_x: enabled
+---
+spec:
+  containers:
+  - name: backend
+    image: nginx:1.23.4-alpine
+    volumeMounts:
+    - name: config
+      mountPath: /etc/config
+  volumes:
+  - name: config
+    configMap:
+      name: app-config</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 25: ConfigMap as Volume</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Create ConfigMap from <code>application.yaml</code></li>
+                            <li>✅ Mount it at <code>/etc/config</code> in a Pod</li>
+                            <li>✅ Read the file from inside the container</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/25-configmap/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🤫</span> Secrets</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Same Shape, Different Intent</h3>
+                        <ul>
+                            <li>Like ConfigMap, but values are base64-encoded</li>
+                            <li>At rest in etcd they may be encrypted (cluster config)</li>
+                            <li>Mounted Secrets are <em>tmpfs</em> in the Pod — never written to disk</li>
+                            <li>Built-in types: <code>Opaque</code>, <code>kubernetes.io/dockerconfigjson</code>, <code>tls</code></li>
+                        </ul>
+                        <div class="danger">
+                            <p><strong>Base64 ≠ encryption.</strong> Don't commit Secrets to git as if they were safe.</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <pre><code class="language-yaml">apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  db-password: cGFzc3dk   # base64("passwd")
+---
+spec:
+  containers:
+  - name: backend
+    image: nginx:1.23.4-alpine
+    env:
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: db-password</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 26: Secret as Env Var</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Create Opaque Secret with <code>db-password=passwd</code></li>
+                            <li>✅ Expose as <code>DB_PASSWORD</code> env var in a Pod</li>
+                            <li>✅ Verify with <code>kubectl exec env</code></li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/26-secret/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section>
+                <h2><span class="emoji">🔒</span> Security Context</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Pod-Level vs Container-Level</h3>
+                        <ul>
+                            <li>Some fields only valid at Pod level: <code>fsGroup</code>, <code>runAsGroup</code></li>
+                            <li>Some only at Container level: <code>allowPrivilegeEscalation</code>, <code>capabilities</code>, <code>readOnlyRootFilesystem</code></li>
+                            <li>Container-level overrides Pod-level when both set</li>
+                        </ul>
+                        <h3>The Big Knobs</h3>
+                        <ul>
+                            <li><code>runAsUser</code> / <code>runAsGroup</code> — drop root</li>
+                            <li><code>runAsNonRoot: true</code> — refuse to start as root</li>
+                            <li><code>readOnlyRootFilesystem</code> — write only to mounted volumes</li>
+                            <li><code>allowPrivilegeEscalation: false</code></li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-security-context
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+  containers:
+  - name: busybox
+    image: busybox:1.36
+    command: ["sh","-c","sleep 1h"]
+    volumeMounts:
+    - name: vol
+      mountPath: /data/test
+    securityContext:
+      allowPrivilegeEscalation: false
+  volumes:
+  - name: vol
+    emptyDir: {}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lab-callout" data-background-color="#326ce5">
+                <div style="text-align: center; color: white;">
+                    <h1><span class="emoji">🔬</span> Lab 27: Security Context End-to-End</h1>
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
+                        <ul style="font-size: 1.1em; line-height: 1.6;">
+                            <li>✅ Pod-level: runAsUser 1000, runAsGroup 3000, fsGroup 2000</li>
+                            <li>✅ Container-level: allowPrivilegeEscalation false</li>
+                            <li>✅ Touch a file in mounted volume</li>
+                            <li>✅ Confirm file UID=1000, GID=2000</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 1.0em;">Follow <code>exercises/27-securitycontext/instructions.md</code></p>
+                </div>
+            </section>
+
+            <section class="title-slide">
+                <h1><span class="emoji">✅</span> Module 4 Complete</h1>
+                <p class="subtitle">You can extend, secure, and configure cluster workloads.</p>
+                <div class="success" style="font-size: 1.0em;">
+                    <p>Next up: <strong>Module 5 — Services &amp; Networking.</strong> The last 20% of CKAD: Services, troubleshooting them, Ingress, NetworkPolicy.</p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/notes/notes.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true, controls: true, progress: true, center: false,
+            keyboard: true, overview: true, transition: 'slide',
+            backgroundTransition: 'fade', fragments: true,
+            plugins: [ RevealHighlight, RevealNotes ],
+            highlight: { highlightOnLoad: true, theme: 'monokai' }
+        });
+        const progressIndicator = document.createElement('div');
+        progressIndicator.className = 'progress-indicator';
+        progressIndicator.textContent = 'Module 4 / 5';
+        document.body.appendChild(progressIndicator);
+    </script>
+</body>
+</html>
