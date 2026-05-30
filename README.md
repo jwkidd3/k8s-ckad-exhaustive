@@ -43,8 +43,10 @@ archive/                    ← superseded material (legacy PDFs, EKS config, et
 
 ## Suggested Daily Plan
 
-| Day | Modules | Labs |
-|---|---|---|
-| Day 1 | 0 + 1 | 00–09, 14 |
-| Day 2 | 2 + 3 | 10–13, 15–19 |
-| Day 3 | 4 + 5 | 20–31 |
+Balanced 11 / 11 / 10 labs across the three days. Modules 1 and 4 are the largest; Module 4 splits at the lab 21→22 boundary (CRD/RBAC closes Day 2, resource governance opens Day 3).
+
+| Day | Theme | Modules | Labs | Count |
+|---|---|---|---|---|
+| Day 1 | Foundations | 0 + 1 | 00–09, 14 | 11 |
+| Day 2 | Deployment, Ops, Identity | 2 + 3 + part of 4 | 10–13, 15–21 | 11 |
+| Day 3 | Config, Security, Networking | rest of 4 + 5 | 22–31 | 10 |
