@@ -2,7 +2,7 @@
 
 A hands-on Certified Kubernetes Application Developer (CKAD) course: 32 labs plus a 6-module slide deck, designed to run on AWS Cloud9 with a local kind cluster.
 
-**Format:** 3 days, 9 AM – 4 PM, with a 1-hour lunch and two breaks. ~16.5 hours of instruction total.
+**Format:** 3 days, 9 AM – 4 PM, with a 1-hour lunch and two breaks. ~16.5 hours of instruction total, split **~70% hands-on labs / ~30% teaching** (≈11.5h lab time, ≈5h slide-driven instruction).
 
 ## Course Layout
 
