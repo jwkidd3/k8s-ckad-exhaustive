@@ -43,7 +43,7 @@ spec:
 Create the Job from the YAML manifest:
 
 ```
-$ kubectl apply -f random-hash-job.yaml
+$ kubectl apply -f job.yaml
 job.batch/random-hash created
 ```
 
