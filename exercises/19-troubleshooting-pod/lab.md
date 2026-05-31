@@ -72,12 +72,39 @@ PID   USER     TIME  COMMAND
    41 root      0:00 ps
 ```
 
-Apparently, the directory we want to write to does indeed not exist.
+Apparently, the directory we want to write to does not exist in the distroless image's filesystem. We can confirm from inside the debug container we attached above:
 
 ```
-$ kubectl exec failing-pod -it -- /bin/sh
 / # ls /root/tmp
 ls: /root/tmp: No such file or directory
 ```
 
-We'll likely want to change the command running the original container to point to directory that does exist upon container start. Alternatively, it may make sense to mount an ephemeral Volume to provide the directory, as shown in [`pod.yaml`](./pod.yaml).
+The cleanest fix is to mount an `emptyDir` volume so the directory exists at runtime — no image rebuild required. Replace the contents of `pod.yaml` with the version below (note the `volumeMounts`/`volumes` additions and the new path under `/var/startup`):
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: date-recorder
+spec:
+  containers:
+  - name: debian
+    image: gcr.io/distroless/nodejs20-debian11
+    command: ["/nodejs/bin/node", "-e", "const fs = require('fs'); let timestamp = Date.now(); fs.writeFile('/var/startup/startup-marker.txt', timestamp.toString(), err => { if (err) { console.error(err); } while(true) {} });"]
+    volumeMounts:
+    - mountPath: /var/startup
+      name: init-volume
+  volumes:
+  - name: init-volume
+    emptyDir: {}
+```
+
+Delete the broken Pod and reapply:
+
+```
+$ kubectl delete pod date-recorder
+$ kubectl apply -f pod.yaml
+$ kubectl get pod date-recorder
+NAME            READY   STATUS    RESTARTS   AGE
+date-recorder   1/1     Running   0          10s
+```

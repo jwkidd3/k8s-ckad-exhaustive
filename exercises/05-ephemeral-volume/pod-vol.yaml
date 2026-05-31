@@ -1,7 +1,7 @@
-apiVersion: v1 
-kind: Pod 
+apiVersion: v1
+kind: Pod
 metadata:
-    name: my-container 
+    name: my-container
 spec:
   volumes:
   - name: logs-volume
