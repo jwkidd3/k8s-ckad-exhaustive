@@ -26,8 +26,8 @@ archive/                    ← superseded material (legacy PDFs, EKS config, et
 ## Getting Started
 
 1. Open this repo in Cloud9.
-2. Open `exercises/00-setup/instructions.md` and work through the cluster setup.
-3. Each subsequent lab has its own `instructions.md` (the spec) and `lab/lab.md` (the step-by-step walkthrough students follow).
+2. Open `exercises/00-setup/lab.md` and work through the cluster setup.
+3. Each subsequent lab is a single `lab.md` file containing the full walkthrough plus any supporting YAML manifests in the same directory.
 4. The presentations under `presentations/` interleave teaching slides with lab callouts — show them alongside the labs.
 
 ## CKAD Domain Coverage

@@ -1,0 +1,148 @@
+# Lab 15
+
+
+<details>
+<summary><b>Quick Reference</b></summary>
+<p>
+
+* Namespace: `default`<br>
+* Documentation: [Helm](https://helm.sh/)
+
+</p>
+</details>
+
+In this exercise, you will practice the implementation, packaging, and installation of a configurable custom Helm chart.
+
+1. Create a new chart file named `Chart.yaml`. Define all mandatory attributes including the chart's API version, the name, and the version. Add the following key-value pairs: `API version: v2`, `Name: web-app`, and `Version: 2.5.4`.
+2. Create a new values file named `values.yaml`. It should contain the following key-value pairs: `service_port: 80`, and `container_port: 3000`.
+3. Create the template file `web-app-pod-template.yaml`. The YAML manifest defines a Pod named `hello-world` with the image `bmuschko/nodejs-hello-world:1.0.0`. The container port uses the placeholder `container_port` from the `values.yaml` file.
+4. Create the template file `web-app-service-template.yaml`. The YAML manifest defines a Service named `web-app-service` of type `ClusterIP`. The target port should use the placeholder `container_port` from the `values.yaml` file, the port should use the placeholder `service_port` from the `values.yaml` file.
+5. Bundle the template files into a chart archive file by running the correct Helm command. What's the name of the file produced?
+6. Install the chart with the name `hello-world` to the namespace `app-stack` using the appropriate Helm command. Override the value of `service_port` with the value `9090`.
+7. Find the installed objects provided by the chart.
+8. Delete the Helm chart.
+---
+
+## Walkthrough
+
+
+Create the file `Chart.yaml` in the current directory:
+
+```
+$ vim Chart.yaml
+```
+
+Add the following content to the file:
+
+```yaml
+apiVersion: v2
+name: web-app
+version: 2.5.4
+```
+
+Create the file `values.yaml` in the current directory:
+
+```
+$ vim values.yaml
+```
+
+Add the following content to the file:
+
+```yaml
+service_port: 80
+container_port: 3000
+```
+
+Create the `templates` subdirectory.
+
+```
+$ mkdir templates
+```
+
+Create the file `web-app-pod-template.yaml` in the directory `templates` with the content shown below:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-world
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: hello-world
+spec:
+  containers:
+  - image: bmuschko/nodejs-hello-world:1.0.0
+    name: hello-world
+    ports:
+    - containerPort: {{ .Values.container_port }}
+      protocol: TCP
+```
+
+Create the file `web-app-service-template.yaml` in the directory `templates`. Add the following content:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: hello-world
+  ports:
+  - protocol: TCP
+    port: {{ .Values.service_port }}
+    targetPort: {{ .Values.container_port }}
+```
+
+The templates directory should contain both files:
+
+```
+$ ls templates
+web-app-pod-template.yaml  web-app-service-template.yaml
+```
+
+Bundle the template files into a chart archive file. The chart archive file is a compressed TAR file with the file ending `.tgz`. The `package` command evaluates the metadata information from the `Chart.yaml` to derive the chart archive file name:
+
+```
+$ helm package .
+Successfully packaged chart and saved it to: /Users/bmuschko/dev/tmp/helm/web-app-2.5.4.tgz
+```
+
+The file `web-app-2.5.4.tgz` should exist in the current directory:
+
+```
+$ ls web-app-2.5.4.tgz
+web-app-2.5.4.tgz
+```
+
+Install the chart to the namespace `app-stack`.
+
+```
+$ helm install --namespace app-stack --create-namespace --set service_port=9090 hello-world .
+NAME: hello-world
+LAST DEPLOYED: Thu May 18 16:55:31 2023
+NAMESPACE: app-stack
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+```
+
+The objects from the chart now exist in the `app-stack` namespace.
+
+```
+$ kubectl get services,pods -n app-stack
+NAME                          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/web-app-service   ClusterIP   10.110.146.91   <none>        9090/TCP   70s
+
+NAME              READY   STATUS    RESTARTS   AGE
+pod/hello-world   1/1     Running   0          70s
+```
+
+Uninstall the chart with the following command. Make sure to provide the namespace.
+
+```
+$ helm uninstall hello-world -n app-stack
+release "hello-world" uninstalled
+```
