@@ -327,14 +327,17 @@ $ kubectl -n kube-system rollout status \
             <section class="lab-callout" data-background-color="#326ce5">
                 <div style="text-align: center; color: white;">
                     <h1><span class="emoji">🔬</span> Time for Hands-On Practice!</h1>
-                    <h2><span class="emoji">☸️</span> Lab 0: Stand Up Your kind Cluster</h2>
+                    <h2><span class="emoji">☸️</span> Lab 0: Provision Cloud9 + Stand Up kind</h2>
                     <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0;">
                         <h3>🎯 What You'll Build:</h3>
-                        <ul style="font-size: 1.1em; line-height: 1.6;">
-                            <li>✅ Install kubectl and kind on Cloud9</li>
-                            <li>✅ Create a 4-node kind cluster from <code>kind-config.yaml</code></li>
-                            <li>✅ Install metrics-server</li>
-                            <li>✅ Verify <code>kubectl top nodes</code> returns data</li>
+                        <ul style="font-size: 1.0em; line-height: 1.5;">
+                            <li>✅ Create a Cloud9 environment in <code>us-east-1</code> (m5.large, Amazon Linux 2023, SSH)</li>
+                            <li>✅ Clone the course repo</li>
+                            <li>✅ Run <code>setup.sh</code> to grow the root EBS volume from 10 GB to 100 GB</li>
+                            <li>✅ <code>sudo reboot</code> so cloud-init grows the partition + XFS</li>
+                            <li>✅ Install <code>kubectl</code> + <code>kind</code> v0.27.0</li>
+                            <li>✅ Create the 4-node kind cluster from <code>kind-config.yaml</code></li>
+                            <li>✅ Install metrics-server and confirm <code>kubectl top nodes</code></li>
                         </ul>
                     </div>
                     <div style="background: rgba(255,193,7,0.2); padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #ffc107;">
